@@ -23,7 +23,11 @@ module Hocho
 
       def hosts
         @hosts ||= files.flat_map do |file|
-          content = Hocho::Utils::Symbolize.keys_of(YAML.load_file(file))
+          content = Hocho::Utils::Symbolize.keys_of(
+            YAML.safe_load_file(
+              file,
+              permitted_classes: [Symbol, Net::SSH::Proxy::Jump, Net::SSH::Proxy::Command]),
+          )
           content.map do |name, value|
             Host.new(
               name.to_s,
